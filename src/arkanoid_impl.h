@@ -11,7 +11,8 @@
 
 
 // data about the ball-brick hit
-struct BrickHitData {
+struct BrickHitData 
+{
     Vect position = Vect(0.0f);
     Vect next_vect = Vect(1.0f);
     int row = 0;

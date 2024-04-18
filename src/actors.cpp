@@ -1,4 +1,5 @@
 #include "actors.h"
+#include "actors.h"
 
 Brick::BrickCollision::BrickCollision(const Brick& brick, float radius, float to_horizontal_radius)
 {
@@ -21,9 +22,9 @@ void Brick::BrickCollision::update(float radius, float prev_radius_multiplier_x,
     points[6].x -= diff;
 }
 
-std::string Brick::get_brick_type()
+BrickType Brick::get_brick_type()
 {
-    return "Brick";
+    return BrickType::Normal;
 }
 
 Brick::Brick(const Brick& brick)
@@ -36,9 +37,11 @@ Brick::Brick(const Brick& brick)
     can_be_damaged = brick.can_be_damaged;
 }
 
-std::string ExplosiveBrick::get_brick_type()
+
+
+BrickType ExplosiveBrick::get_brick_type()
 {
-    return "ExplosiveBrick";
+    return BrickType::Explosive;
 }
 
 Bonus::Bonus(const Brick& brick)

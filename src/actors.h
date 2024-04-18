@@ -5,16 +5,19 @@
 #include <array>
 #include "base.h"
 
-//todo why not enum class ?
-enum ExplosionType {
+enum class BrickType {
+    Normal,
+    Explosive
+};
+
+enum class ExplosionType {
     Vertical,
     Horizontal,
     Diagonal,
     Radial,
 };
 
-//todo why not enum class ?
-enum BonusType {
+enum class BonusType {
     AnotherBall,
     ExtraLife,
     TurnBrickIntoExplosive,
@@ -23,26 +26,28 @@ enum BonusType {
 };
 
 // default brick
-struct Brick {
+struct Brick
+{
 
-    struct BrickCollision {
+    struct BrickCollision
+    {
         BrickCollision() = default;
         BrickCollision(const Brick& brick, float radius, float to_horizontal_radius);
 
         std::array<Vect, 8> points;
-        bool visible = true; //todo rename to visible
+        bool visible = true;
         void update(float radius, float prev_radius_multiplier_x, float new_radius_multiplier_x);
    };
 
     Brick() = default;
     Brick(const Brick& brick);
     
-    virtual std::string get_brick_type(); //todo use enum
+    virtual BrickType get_brick_type();
 
     BrickCollision collision;
     Vect brick_pos = Vect(0.0f);
     Vect brick_size = Vect(0.0f);
-    
+
     bool can_be_damaged = true; // obstacle or not
     int hits_left = 1;
     int score = 100;
@@ -50,30 +55,34 @@ struct Brick {
 };
 
 // deals damage by ExplosionType pattern within the distance of expolosion_dist
-struct ExplosiveBrick : Brick {
+struct ExplosiveBrick : Brick 
+{
+    ExplosiveBrick() = default;
     ExplosiveBrick(const Brick& brick) : Brick::Brick(brick) {};
 
-    std::string get_brick_type() override;
-    
+    BrickType get_brick_type() override;
+
     int explosion_dist = 1;
     unsigned int damage = 1;
-    ExplosionType type = Radial;
+    ExplosionType expl_type = ExplosionType::Radial;
 };
 
 // ball, we can have multiple balls
-struct Ball {
+struct Ball
+{
     Vect position = Vect(0.0f);
     Vect velocity = Vect(0.0f);
     float radius = 0.0f;
     float initial_speed = 0.0f;
     float speed = 0;
 
-    bool active = true; //todo rename to active
+    bool active = true;
     bool on_start = true;
 };
 
 // our racket
-struct Racket {
+struct Racket
+{
     Vect position = Vect(0.0f);
     float sensitivity = 0.0f;
     float width = 0.0f;
@@ -81,13 +90,14 @@ struct Racket {
 };
 
 // bonus, falling, can be catched 
-struct Bonus {
+struct Bonus
+{
     Bonus() = default;
     Bonus(const Brick& brick);
 
     Vect position = Vect(0.0f);
     Vect size = Vect(0.0f);
     float falling_speed = 0.0f;
-    BonusType type = AnotherBall;
+    BonusType type = BonusType::AnotherBall;
 };
 

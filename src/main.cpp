@@ -131,14 +131,17 @@ int main(int, char**)
             ImGui::Checkbox("Show world settings", &arkanoid_settings.show_world_settings);
             ImGui::Spacing();
 
-            if (arkanoid_settings.show_world_settings) {
+            if (arkanoid_settings.show_world_settings) 
+            {
                 ImGui::InputFloat2("World size", arkanoid_settings.world_size.data_);
-                if (arkanoid_settings.world_size.x < arkanoid_settings.racket_width) {
+                if (arkanoid_settings.world_size.x < arkanoid_settings.racket_width) 
+                {
                     arkanoid_settings.world_size.x = arkanoid_settings.racket_width;
                 } // bruh
 
                 
-                if (arkanoid_settings.world_size.y < arkanoid_settings.ball_radius * 2.0f + arkanoid_settings.ball_speed * 0.3f + 50.0f) {
+                if (arkanoid_settings.world_size.y < arkanoid_settings.ball_radius * 2.0f + arkanoid_settings.ball_speed * 0.3f + 50.0f) 
+                {
                     arkanoid_settings.world_size.y = arkanoid_settings.ball_radius * 2.0f + arkanoid_settings.ball_speed * 0.3f + 50.0f; // meh
                 }
             }
@@ -147,7 +150,8 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Show bricks settings", &arkanoid_settings.show_bricks_settings);
             
-            if (arkanoid_settings.show_bricks_settings) {
+            if (arkanoid_settings.show_bricks_settings) 
+            {
                 ImGui::SliderInt("Bricks columns", &arkanoid_settings.bricks_columns_count, ArkanoidSettings::bricks_columns_min, ArkanoidSettings::bricks_columns_max);
                 ImGui::SliderInt("Bricks rows", &arkanoid_settings.bricks_rows_count, ArkanoidSettings::bricks_rows_min, ArkanoidSettings::bricks_rows_max);
 
@@ -160,7 +164,8 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Show bonuses settings", &arkanoid_settings.show_bonuses_settings);
 
-            if (arkanoid_settings.show_bonuses_settings) {
+            if (arkanoid_settings.show_bonuses_settings) 
+            {
                 ImGui::SliderFloat("Bonus chance", &arkanoid_settings.bonus_chance_choice, ArkanoidSettings::bonus_chance_min, ArkanoidSettings::bonus_chance_max);
                 ImGui::SliderFloat("Bonus falling speed (!will be sacaled to world!)", &arkanoid_settings.bonus_speed_choice, ArkanoidSettings::bonus_falling_speed_min, ArkanoidSettings::bonus_falling_speed_max);
             }
@@ -169,7 +174,8 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Show balls settings", &arkanoid_settings.show_ball_settings);
 
-            if (arkanoid_settings.show_ball_settings) {
+            if (arkanoid_settings.show_ball_settings) 
+            {
                 ImGui::SliderFloat("Ball radius", &arkanoid_settings.ball_radius, ArkanoidSettings::ball_radius_min, ArkanoidSettings::ball_radius_max);
                 ImGui::SliderFloat("Ball speed", &arkanoid_settings.ball_speed, ArkanoidSettings::ball_speed_min, ArkanoidSettings::ball_speed_max);
             }
@@ -179,7 +185,8 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Show racket settings", &arkanoid_settings.show_carriege_settings);
 
-            if (arkanoid_settings.show_carriege_settings) {
+            if (arkanoid_settings.show_carriege_settings) 
+            {
                 ImGui::Spacing();
                 ImGui::SliderFloat("racket width", &arkanoid_settings.racket_width, ArkanoidSettings::racket_width_min, arkanoid_settings.world_size.x);
 
@@ -191,7 +198,8 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Show game mode settings", &arkanoid_settings.show_game_mode_settings);
 
-            if (arkanoid_settings.show_game_mode_settings) {
+            if (arkanoid_settings.show_game_mode_settings) 
+            {
                 ImGui::Checkbox("Multiplier", &arkanoid_settings.multiplier);
                 ImGui::Checkbox("Explosive bricks", &arkanoid_settings.explosive_bricks);
                 ImGui::Checkbox("Random brick scores", &arkanoid_settings.random_bricks);
@@ -199,7 +207,8 @@ int main(int, char**)
                 ImGui::SliderInt("Hits to break brick", &arkanoid_settings.hits_for_brick_to_destroy, ArkanoidSettings::hits_for_brick_to_destroy_min, ArkanoidSettings::hits_for_brick_to_destroy_max);
             }
 
-            if ((arkanoid->get_game_over() && io.KeysDown[GLFW_KEY_ENTER]) || ImGui::Button("Reset")) {
+            if ((arkanoid->get_game_over() && io.KeysDown[GLFW_KEY_ENTER]) || ImGui::Button("Reset")) 
+            {
                 arkanoid->reset(arkanoid_settings, arkanoid_debug_data);
             }
 
@@ -226,11 +235,13 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Steps by step", &arkanoid_settings.step_by_step);
 
-            if (arkanoid_settings.step_by_step) {
+            if (arkanoid_settings.step_by_step) 
+            {
                 do_arkanoid_update = false;
             }
 
-            if (ImGui::Button("Next step (SPACE Key)") || io.KeysDown[GLFW_KEY_SPACE]) {
+            if (ImGui::Button("Next step (SPACE Key)") || io.KeysDown[GLFW_KEY_SPACE]) 
+            {
                 do_arkanoid_update = true;
             }
 
@@ -248,10 +259,12 @@ int main(int, char**)
                 // clear aim helpers before the update (maximum 3, so this should be fine)
                 arkanoid_debug_data.aim_helpers.clear();
 
-                if (arkanoid_settings.god_mode) {
+                if (arkanoid_settings.god_mode) 
+                {
                     arkanoid_debug_data.god_mode = true;
                 }
-                else {
+                else 
+                {
                     arkanoid_debug_data.god_mode = false;
                 }
 
@@ -263,7 +276,8 @@ int main(int, char**)
                 for(auto& hit : arkanoid_debug_data.hits)
                 {
                     hit.time += elapsed_time;
-                    if (hit.time > arkanoid_settings.debug_draw_timeout) {
+                    if (hit.time > arkanoid_settings.debug_draw_timeout) 
+                    {
                         remove_by_timeout_count++;
                     }
                 }
@@ -292,22 +306,30 @@ int main(int, char**)
                 bg_drawlist->AddLine(hit.screen_pos, hit.screen_pos + hit.normal * len, ImColor(255, 0, 0));
             }
 
-            if (arkanoid_settings.draw_aim_helper) {
-                for (auto& aim_helper : arkanoid_debug_data.aim_helpers) {
+            if (arkanoid_settings.draw_aim_helper) 
+            {
+                for (auto& aim_helper : arkanoid_debug_data.aim_helpers) 
+                {
                     bg_drawlist->AddCircle(aim_helper.screen_p2, aim_helper.screen_radius, ImColor(255, 0, 0));
                     bg_drawlist->AddLine(aim_helper.screen_p1, aim_helper.screen_p2, ImColor(255, 0, 0));
                 }
             }
 
-            if (arkanoid_settings.draw_brick_radials) {
+            if (arkanoid_settings.draw_brick_radials) 
+            {
                 for (int i = 0; i < arkanoid_debug_data.bricks_collisions.size(); ++i)
-                    for (int j = 0; j < arkanoid_debug_data.bricks_collisions[0].size(); ++j) {
-                        if (arkanoid_debug_data.bricks_collisions[i][j].is_visible) {
-                            for (int k = 0; k < 8; ++k) {
+                {
+                    for (int j = 0; j < arkanoid_debug_data.bricks_collisions[0].size(); ++j)
+                    {
+                        if (arkanoid_debug_data.bricks_collisions[i][j].is_visible)
+                        {
+                            for (int k = 0; k < 8; ++k)
+                            {
                                 bg_drawlist->AddLine(arkanoid_debug_data.bricks_collisions[i][j].screen_points[k], arkanoid_debug_data.bricks_collisions[i][j].screen_points[(k + 1) % 8], ImColor(0, 255, 0));
                             }
                         }
                     }
+                }
             }
         }
         

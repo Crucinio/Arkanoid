@@ -24,13 +24,16 @@ std::string to_string_with_precision(const T value, const int n = 2)
     return std::move(out).str();
 } 
 
-void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& debug_data)
+void ArkanoidImpl::reset(const ArkanoidSettings& settings, ArkanoidDebugData& debug_data)
 {
     // clearing containers
     balls.clear();
-    for (int i = 0; i < bricks.size(); ++i) {
+    for (int i = 0; i < bricks.size(); ++i)
+    {
         for (int j = 0; j < bricks.size(); ++j)
+        {
             delete bricks[i][j];
+        }
 
         bricks[i].clear();
     }
@@ -50,24 +53,30 @@ void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& de
     max_balls = settings.ball_maximum_qnt;
     // multiplier
     multiplier_on = settings.multiplier;
-    if (multiplier_on) {
+    if (multiplier_on)
+    {
         muliplier_from_speed = (settings.ball_speed - 300.0f) / 1000.0f;
-        if (settings.racket_width < 100.0f) {
+        if (settings.racket_width < 100.0f)
+        {
             multiplier_from_racket_width = (100.0f - settings.racket_width) / 100.0f;
         }
-        else if (settings.racket_width > 400.0f) {
+        else if (settings.racket_width > 400.0f)
+        {
             multiplier_from_racket_width = -1.0f;
         }
-        else {
+        else
+        {
             multiplier_from_racket_width = -((settings.racket_width - 100.0f) / 300.0f);
         }
 
         score_multiplier = 1.0f + muliplier_from_speed + multiplier_from_racket_width;
-        if (score_multiplier < 0.0f) {
+        if (score_multiplier < 0.0f)
+        {
             score_multiplier = 0.0f;
         }
     }
-    else {
+    else
+    {
         score_multiplier = 1.0f;
     }
 
@@ -87,7 +96,7 @@ void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& de
     world_to_screen = Vect(settings.display_w / world_size.x, settings.display_h / world_size.y);
     world_to_screen_diff_xy = world_to_screen.x - world_to_screen.y;
     to_horizontal_radius = world_to_screen.y / world_to_screen.x;
-    world_scale = Vect(800.0f / world_size.x , 600.0f / world_size.y);
+    world_scale = Vect(800.0f / world_size.x, 600.0f / world_size.y);
 
     // Scaling
     padding_text_y = 13.0f / world_scale.y;
@@ -103,7 +112,7 @@ void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& de
     padding_lives_from_bottom = 20.0f / world_scale.y;
     bonus_falling_speed = settings.bonus_speed_choice / world_scale.y;
     bonus_drop_chance = settings.bonus_chance_choice;
-    
+
 
     // Racket
     racket.basic_height = (settings.world_size.y * 0.02f);
@@ -115,7 +124,7 @@ void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& de
     ball_initial_speed = settings.ball_speed;
     spawn_ball();
 
-    
+
 
     // Bricks init
 
@@ -126,9 +135,11 @@ void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& de
     brick_height = (settings.world_size.y * 0.3f) / rows;
 
     bricks = std::vector<std::vector<Brick*> >(rows);
-    for (int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i)
+    {
         bricks[i] = std::vector<Brick*>(columns);
-        for (int j = 0; j < columns; ++j) {
+        for (int j = 0; j < columns; ++j)
+        {
             // default brick
             Brick brick;
             brick.brick_pos = Vect((j + 1) * brick_padding_x + j * brick_width, padding_playzone_from_top + i * (brick_padding_y + brick_height));
@@ -136,30 +147,37 @@ void ArkanoidImpl::reset(const ArkanoidSettings &settings, ArkanoidDebugData& de
             brick.can_be_damaged = true;
             brick.hits_left = hits_to_destroy;
             brick.collision = Brick::BrickCollision(brick, settings.ball_radius, to_horizontal_radius);
-            if (settings.random_bricks) {
+            if (settings.random_bricks)
+            {
                 brick.score = 100 * (rand() % 3 + 1);
             }
-            else {
+            else
+            {
                 int r = settings.bricks_rows_count / 3;
-                if (i < r) {
+                if (i < r)
+                {
                     brick.score = 300;
                 }
-                else if (i < r * 2) {
+                else if (i < r * 2)
+                {
                     brick.score = 200;
                 }
-                else {
+                else
+                {
                     brick.score = 100;
                 }
 
             }
 
             int chance = 100 * settings.explosive_brick_chance;
-            if (settings.explosive_bricks && chance > (rand() % 100)) {
+            if (settings.explosive_bricks && chance > (rand() % 100))
+            {
                 ExplosiveBrick expl_brick(brick);
-                expl_brick.type = static_cast<ExplosionType>(rand() % 4);
+                expl_brick.expl_type = static_cast<ExplosionType>(rand() % 4);
                 bricks[i][j] = new ExplosiveBrick(expl_brick);
             } // explosive
-            else {
+            else
+            {
                 bricks[i][j] = new Brick(brick); // default
             }
         }
@@ -175,7 +193,8 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
     world_to_screen_diff_xy = world_to_screen.x - world_to_screen.y;
     float cur_hor_rad = to_horizontal_radius;
     to_horizontal_radius = world_to_screen.y / world_to_screen.x;
-    if (cur_hor_rad != to_horizontal_radius) {
+    if (cur_hor_rad != to_horizontal_radius)
+    {
         transform_collisions(ball_radius, cur_hor_rad, to_horizontal_radius);
         update_all_debug_brick_collisions(debug_data);
     }
@@ -183,9 +202,12 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
     
 
     // process user input
+   
     {
-        if (io.KeysDown[GLFW_KEY_SPACE]) {
-            for (Ball& ball : balls) {
+        if (io.KeysDown[GLFW_KEY_SPACE])
+        {
+            for (Ball& ball : balls)
+        {
                 ball.on_start = false;
             }
 
@@ -194,52 +216,69 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
 
         bool ignore_ctrl = true;
         for (Ball& ball : balls)
-            if (ball.on_start) {
+            if (ball.on_start)
+            {
                 ignore_ctrl = false;
                 break;
             } // Check if there are balls on racket
 
-        if (!ignore_ctrl && io.KeysDown[GLFW_KEY_LEFT_CONTROL]) {
-            for (Ball& ball : balls) {
-                if (ball.on_start) {
-                    if (io.KeysDown[GLFW_KEY_A]) {
+        if (!ignore_ctrl && io.KeysDown[GLFW_KEY_LEFT_CONTROL])
+        {
+            for (Ball& ball : balls)
+            {
+                if (ball.on_start)
+                {
+                    if (io.KeysDown[GLFW_KEY_A])
+                    {
                         ball.position.x -= racket.sensitivity / 2;
 
-                        if (ball.position.x < racket.position.x) {
+                        if (ball.position.x < racket.position.x)
+                        {
                             ball.position.x = racket.position.x;
                         }
 
-                        if (ball.position.x < ball.radius * to_horizontal_radius) {
+                        if (ball.position.x < ball.radius * to_horizontal_radius)
+                        {
                             ball.position.x = ball.radius * to_horizontal_radius;
                         }
                     }
 
-                    if (io.KeysDown[GLFW_KEY_D]) {
+                    if (io.KeysDown[GLFW_KEY_D])
+                    {
                         ball.position.x += racket.sensitivity / 2;
 
-                        if (ball.position.x > racket.position.x + racket.width) {
+                        if (ball.position.x > racket.position.x + racket.width)
+                        {
                             ball.position.x = racket.position.x + racket.width;
                         }
 
-                        if (ball.position.x > world_size.x - ball.radius * to_horizontal_radius) {
+                        if (ball.position.x > world_size.x - ball.radius * to_horizontal_radius)
+                        {
                             ball.position.x = world_size.x - ball.radius * to_horizontal_radius;
                         }
                     }
                 }
             }
         } // Control balls on racket
-        else {
-            if (io.KeysDown[GLFW_KEY_A]) {
+        else
+        {
+            if (io.KeysDown[GLFW_KEY_A])
+            {
                 racket.position.x -= racket.sensitivity;
-                if (racket.position.x < 0) {
+                if (racket.position.x < 0)
+                {
                     racket.position.x = 0;
                 }
-                else {
-                    for (Ball& ball : balls) {
-                        if (ball.on_start) {
+                else
+                {
+                    for (Ball& ball : balls)
+                    {
+                        if (ball.on_start)
+                        {
                             ball.position.x -= racket.sensitivity;
 
-                            if (ball.position.x < ball.radius * to_horizontal_radius) {
+                            if (ball.position.x < ball.radius * to_horizontal_radius)
+                            {
                                 ball.position.x = ball.radius * to_horizontal_radius;
                             }
                         }
@@ -247,15 +286,20 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
                 }
             }
 
-            if (io.KeysDown[GLFW_KEY_D]) {
+            if (io.KeysDown[GLFW_KEY_D])
+            {
                 racket.position.x += racket.sensitivity;
 
-                if (racket.position.x > world_size.x - racket.width) {
+                if (racket.position.x > world_size.x - racket.width)
+                {
                     racket.position.x = world_size.x - racket.width;
                 }
-                else {
-                    for (Ball& ball : balls) {
-                        if (ball.on_start) {
+                else
+                {
+                    for (Ball& ball : balls)
+                    {
+                        if (ball.on_start)
+                        {
                             ball.position.x += racket.sensitivity;
 
                             if (ball.position.x > world_size.x - ball.radius * to_horizontal_radius)
@@ -271,16 +315,20 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
         return;
 
     // balls handling
+   
     {
         std::vector<Ball>::iterator it = balls.begin();
-        while (it != balls.end()) {
+        while (it != balls.end())
+        {
             Vect previous_position = it->position;
             // update ball position according
                 // its velocity and elapsed time
-            if (!it->on_start) {
+            if (!it->on_start)
+            {
                 it->position += it->velocity * elapsed;
             }
-            else {
+            else
+            {
                 it->velocity = calulate_bounce_vector(it->initial_speed, racket.width, racket.position.x + racket.width * 0.5f - it->position.x);
                 Vect next = next_hit(it->position, it->velocity, it->radius);
                 add_debug_aim_helper(debug_data, it->radius, it->position, next);
@@ -289,19 +337,24 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
             }
 
             // kill zone/active zone
+           
             {
-                if (!debug_data.god_mode) {
-                    if (previous_position.y > world_size.y + it->radius) {
+                if (!debug_data.god_mode)
+                {
+                    if (previous_position.y > world_size.y + it->radius)
+                    {
                         it = balls.erase(it);
                         continue;
                     }
 
-                    if (!it->active) {
+                    if (!it->active)
+                    {
                         ++it;
                         continue;
                     }
 
-                    if (previous_position.y > racket.position.y + 0.5f * racket.basic_height) {
+                    if (previous_position.y > racket.position.y + 0.5f * racket.basic_height)
+                    {
                         it->active = false;
                         ++it;
                         continue;
@@ -310,6 +363,7 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
             }
 
             // hit border processing;
+           
             {
                 // special scaling for horizontal since we scale radius in "draw" with Y
                 // if we don't there is a scaling problem (hitting before or after the display hit)
@@ -347,12 +401,15 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
             // racket hit processing
             if (racket.position.x - it->radius * to_horizontal_radius * spec < it->position.x
                 && racket.position.x + racket.width + it->radius * to_horizontal_radius * spec > it->position.x
-                && racket.position.y - it->radius < it->position.y) {
+                && racket.position.y - it->radius < it->position.y)
+            {
                 // if we catch it below the racket line
-                if (it->position.y < racket.position.y + racket.basic_height * 0.5) {
+                if (it->position.y < racket.position.y + racket.basic_height * 0.5)
+                {
                     it->position.y = racket.position.y - it->radius;
                 }
-                else {
+                else
+                {
                     double diff = it->position.y - racket.position.y + it->radius;
                     float diff_t = diff / it->velocity.y;
                     it->position.y = racket.position.y - it->radius;
@@ -369,16 +426,19 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
             
             
             float left = elapsed;
-            while (data.next_vect != Vect(1.0f) && elapsed > 0) {
+            while (data.next_vect != Vect(1.0f) && elapsed > 0)
+            {
                 --bricks[data.row][data.column]->hits_left;
-                if (!bricks[data.row][data.column]->hits_left) {
+                if (!bricks[data.row][data.column]->hits_left)
+                {
                     bricks[data.row][data.column]->collision.visible = false;
                     score += bricks[data.row][data.column]->score * score_multiplier;
 
                     update_debug_brick_collision(debug_data, data.row, data.column);
 
-                    if (bricks[data.row][data.column]->get_brick_type() == "ExplosiveBrick") {
-                        ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[data.row][data.column])->type;
+                    if (bricks[data.row][data.column]->get_brick_type() == BrickType::Explosive)
+                    {
+                        ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[data.row][data.column])->expl_type;
                         int d = dynamic_cast<ExplosiveBrick*>(bricks[data.row][data.column])->explosion_dist;
                         int damage = dynamic_cast<ExplosiveBrick*>(bricks[data.row][data.column])->damage;
                         process_possible_explosion(data.row, data.column);
@@ -395,19 +455,25 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
 
 
                 // debug brick hit
-                if (data.next_vect.x < 0) {
-                    if (it->velocity.x > 0) {
+                if (data.next_vect.x < 0)
+                {
+                    if (it->velocity.x > 0)
+                    {
                         add_debug_hit(debug_data, data.position, Vect(1, 0));
                     }
-                    else {
+                    else
+                    {
                         add_debug_hit(debug_data, data.position, Vect(-1, 0));
                     }
                 }
-                else {
-                    if (it->velocity.y > 0) {
+                else
+                {
+                    if (it->velocity.y > 0)
+                    {
                         add_debug_hit(debug_data, data.position, Vect(0, 1));
                     }
-                    else {
+                    else
+                    {
                         add_debug_hit(debug_data, data.position, Vect(0, -1));
                     }
                 }
@@ -427,27 +493,34 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
 
     // bricks
     for (int i = 0; i < bricks.size(); ++i)
-        for (int j = 0; j < bricks[0].size(); ++j) {
-            if (!bricks[i][j]) {
+        for (int j = 0; j < bricks[0].size(); ++j)
+        {
+            if (!bricks[i][j])
+            {
                 continue;
             }
 
-            if (bricks[i][j]->ticks_before_explosion > 0) {
+            if (bricks[i][j]->ticks_before_explosion > 0)
+            {
                 --bricks[i][j]->ticks_before_explosion;
-                if (ticks_before_explosion == 0) {
+                if (ticks_before_explosion == 0)
+                {
                     destroy_brick(i, j);
                 }
             }
-            else if (bricks[i][j]->hits_left == 0) {
+            else if (bricks[i][j]->hits_left == 0)
+            {
                 destroy_brick(i, j);
             }
         }
 
     // bonuses
     std::vector<Bonus>::iterator it = bonuses.begin();
-    while (it != bonuses.end()) {
+    while (it != bonuses.end())
+    {
         it->position.y += it->falling_speed * elapsed;
-        if (it->position.y > world_size.y) {
+        if (it->position.y > world_size.y)
+        {
             it = bonuses.erase(it);
             continue;
         }
@@ -455,21 +528,25 @@ void ArkanoidImpl::update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elap
         if (it->position.x < racket.position.x + racket.width &&
             it->position.x + it->size.x > racket.position.x &&
             it->position.y + it->size.y > racket.position.y &&
-            it->position.y < racket.position.y + racket.basic_height) {
+            it->position.y < racket.position.y + racket.basic_height)
+        {
             
             execute_bonus(*it);
             it = bonuses.erase(it);
         }
-        else {
+        else
+        {
             ++it;
         }
     }
     bonuses.shrink_to_fit();
 
     // lives
-    if (balls.size() < 1) {
+    if (balls.size() < 1)
+    {
         --lives;
-        if (lives == 0) {
+        if (lives == 0)
+        {
             game_over = true;
             return;
         }
@@ -487,25 +564,31 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
     float text_size = padding_text_y * world_to_screen.y;
     float text_pos_x = (world_size.x / 2.0f - max_text_shift_x) * world_to_screen.x;
     float text_pos_y_center = (world_size.y / 2.0f) * world_to_screen.y;
+   
     { 
         //drawing score
         draw_list.AddText(nullptr, padding_text_y * world_to_screen.y, Vect(padding_x, padding_score_text_from_top) * world_to_screen, my_text_color, ("HIGHEST SCORE: " + std::to_string(highest_score)).c_str());
-        if (score > highest_score) {
+        if (score > highest_score)
+        {
             draw_list.AddText(nullptr, padding_text_y * world_to_screen.y, Vect(padding_x, padding_score_text_from_top + padding_text_y) * world_to_screen, new_record_color, ("SCORE: " + std::to_string(score)).c_str());
         }
-        else {
+        else
+        {
             draw_list.AddText(nullptr, padding_text_y * world_to_screen.y, Vect(padding_x, padding_score_text_from_top + padding_text_y) * world_to_screen, my_text_color, ("SCORE: " + std::to_string(score)).c_str());
         }
         
         
-        if (game_over) {
+        if (game_over)
+        {
             int r = 0;
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, "GAME OVER");
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, "Statistics:");
-            if (score >= highest_score) {
+            if (score >= highest_score)
+            {
                 draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, ("Final score: " + std::to_string(score) + " (Your highest!)").c_str());
             }
-            else {
+            else
+            {
                 draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, ("Final score: " + std::to_string(score)).c_str());
             }
 
@@ -518,7 +601,8 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
             r += 2;
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, "Press ENTER or RESET to start new game");
         } // Statistics (game over)
-        else if (game_start) {
+        else if (game_start)
+        {
             int r = 0;
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, "Controls:");
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, "Use A/D keys to control the racket");
@@ -531,16 +615,20 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, ("Recommended ball speed    300.00  (currently: " + to_string_with_precision(ball_initial_speed, precision) + ")").c_str());
             draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, my_text_color, ("Recommended racket width  100.00  (currently: " + to_string_with_precision(racket.width, precision) + ")").c_str());
             
-            if (!multiplier_on) {
+            if (!multiplier_on)
+            {
                 draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, ImColor(255, 255, 0), ("Your score multiplier for this round: " + to_string_with_precision(score_multiplier, precision) + "(multiplier is turned off)").c_str());
             }
-            else if (score_multiplier > 0.6f && score_multiplier < 1.0f) {
+            else if (score_multiplier > 0.6f && score_multiplier < 1.0f)
+            {
                 draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, ImColor(255, 255, 0), ("Your score multiplier for this round: " + to_string_with_precision(score_multiplier, precision)).c_str());
             }
-            else if (score_multiplier >= 1.0f && score_multiplier < 1.4f) {
+            else if (score_multiplier >= 1.0f && score_multiplier < 1.4f)
+            {
                 draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, ImColor(0, 255, 0), ("Your score multiplier for this round: " + to_string_with_precision(score_multiplier, precision)).c_str());
             }
-            else if (score_multiplier >= 1.4f) {
+            else if (score_multiplier >= 1.4f)
+            {
                 draw_list.AddText(nullptr, text_size, Vect(text_pos_x, text_pos_y_center) + Vect(0, r++ * padding_text_y) * world_to_screen, ImColor(100, 100, 255), ("Your score multiplier for this round: " + to_string_with_precision(score_multiplier, precision)).c_str());
             }
             else
@@ -556,59 +644,75 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
 
     // drawing lives
     float y = world_size.y - padding_lives_from_bottom;
-    for (int i = 0; i < lives - 1; ++i) {
+    for (int i = 0; i < lives - 1; ++i)
+    {
         draw_list.AddCircleFilled(Vect(padding_x * world_to_screen.x + (padding_lives_by_rad * i * world_to_screen.y), y * world_to_screen.y), (padding_lives_by_rad  / 2.0f) * world_to_screen.y, ball_color);
         draw_list.AddCircle(Vect(padding_x * world_to_screen.x + (padding_lives_by_rad * i * world_to_screen.y), y * world_to_screen.y), (padding_lives_by_rad / 2.0f) * world_to_screen.y, ball_outline_color, 0, 1.0f);
     }
 
     // drawing bricks
     for (int i = 0; i < bricks.size(); ++i)
-        for (int j = 0; j < bricks[0].size(); ++j) {
-            if (!bricks[i][j]) {
+    {
+        for (int j = 0; j < bricks[0].size(); ++j)
+        {
+            if (!bricks[i][j])
+            {
                 continue;
             }
 
-            if (bricks[i][j]->hits_left > 0) {
+            if (bricks[i][j]->hits_left > 0)
+            {
                 draw_list.AddRectFilled(bricks[i][j]->brick_pos * world_to_screen, (bricks[i][j]->brick_pos + bricks[i][j]->brick_size) * world_to_screen, score_to_color.at(bricks[i][j]->score));
-                if (bricks[i][j]->get_brick_type() == "ExplosiveBrick") {
-                    ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[i][j])->type;
-                    if (type == Radial)
+                if (bricks[i][j]->get_brick_type() == BrickType::Explosive)
+                {
+                    ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[i][j])->expl_type;
+                    if (type == ExplosionType::Radial)
                         draw_list.AddCircleFilled((bricks[i][j]->brick_pos + bricks[i][j]->brick_size / 2.0f) * world_to_screen, bricks[i][j]->brick_size.y * world_to_screen.y / 3.0f, ImColor(0, 0, 0));
-                    else if (type == Diagonal) {
+                    else if (type == ExplosionType::Diagonal)
+                    {
                         draw_list.AddLine(bricks[i][j]->brick_pos * world_to_screen, (bricks[i][j]->brick_pos + bricks[i][j]->brick_size) * world_to_screen, ImColor(0, 0, 0), 2.0f);
                         draw_list.AddLine((bricks[i][j]->brick_pos + Vect(0, bricks[i][j]->brick_size.y)) * world_to_screen, (bricks[i][j]->brick_pos + Vect(bricks[i][j]->brick_size.x, 0)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
                     }
-                    else if (type == Horizontal) {
+                    else if (type == ExplosionType::Horizontal)
+                    {
                         draw_list.AddLine((bricks[i][j]->brick_pos + Vect(0, bricks[i][j]->brick_size.y / 2.0f)) * world_to_screen, (bricks[i][j]->brick_pos + Vect(bricks[i][j]->brick_size.x, bricks[i][j]->brick_size.y / 2.0f)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
                     }
-                    else if (type == Vertical) {
+                    else if (type == ExplosionType::Vertical)
+                    {
                         draw_list.AddLine((bricks[i][j]->brick_pos + Vect(bricks[i][j]->brick_size.x / 2.0f, 0)) * world_to_screen, (bricks[i][j]->brick_pos + Vect(bricks[i][j]->brick_size.x / 2.0f, bricks[i][j]->brick_size.y)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
 
                     }
                 }
             }
-            else if (bricks[i][j]->ticks_before_explosion > 0) {
+            else if (bricks[i][j]->ticks_before_explosion > 0)
+            {
                 draw_list.AddRectFilled(bricks[i][j]->brick_pos * world_to_screen, (bricks[i][j]->brick_pos + bricks[i][j]->brick_size) * world_to_screen, ImColor(255, 0, 0));
             }
         }
+    }
 
     // drawing bonuses
-    for (int i = 0; i < bonuses.size(); ++i) {
+    for (int i = 0; i < bonuses.size(); ++i)
+    {
         draw_list.AddRectFilled(bonuses[i].position * world_to_screen, (bonuses[i].position + bonuses[i].size) * world_to_screen, bonus_color);
-        if (bonuses[i].type == AnotherBall) {
+        if (bonuses[i].type == BonusType::AnotherBall)
+        {
             draw_list.AddCircleFilled((bonuses[i].position + bonuses[i].size / 2.0f) * world_to_screen, bonuses[i].size.x / 4.0f, inner_bonus);
         }
-        else if (bonuses[i].type == ExtraLife) {
+        else if (bonuses[i].type == BonusType::ExtraLife)
+        {
             draw_list.AddText(nullptr, text_size * 2, ((bonuses[i].position + bonuses[i].size / 2.0f) - Vect(padding_x, text_size)) * world_to_screen, inner_bonus, "+ 1");
         }
-        else if (bonuses[i].type == Jackpot) {
-            draw_list.AddCircleFilled((bonuses[i].position + bonuses[i].size / 2.0f)* world_to_screen, bonuses[i].size.x / 4.0f, score_to_color.at(300));
+        else if (bonuses[i].type == BonusType::Jackpot)
+        {
+            draw_list.AddCircleFilled((bonuses[i].position + bonuses[i].size / 2.0f) * world_to_screen, bonuses[i].size.x / 4.0f, score_to_color.at(300));
         }
-        else if (bonuses[i].type == TurnBrickIntoExplosive) {
-            draw_list.AddText(nullptr, text_size * 2, ((bonuses[i].position + bonuses[i].size / 2.0f) - Vect(padding_x, text_size))* world_to_screen, inner_bonus, "BOOM");
+        else if (bonuses[i].type == BonusType::TurnBrickIntoExplosive)
+        {
+            draw_list.AddText(nullptr, text_size * 2, ((bonuses[i].position + bonuses[i].size / 2.0f) - Vect(padding_x, text_size)) * world_to_screen, inner_bonus, "BOOM");
         }
 
-        draw_list.AddRect(bonuses[i].position * world_to_screen, (bonuses[i].position + bonuses[i].size)* world_to_screen, inner_bonus, 0, 0, (4.0f * world_to_screen.y / world_scale.y));
+        draw_list.AddRect(bonuses[i].position * world_to_screen, (bonuses[i].position + bonuses[i].size) * world_to_screen, inner_bonus, 0, 0, (4.0f * world_to_screen.y / world_scale.y));
     }
 
     // drawing carriege
@@ -619,9 +723,10 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
     draw_list.AddRect(screen_pos, screen_pos + Vect(screen_width, screen_height), ImColor(50, 50, 200), 0, 0, 3.0f);
 
     // drawing balls
-    for (auto& ball : balls) {
+    for (auto& ball : balls)
+    {
         Vect screen_pos = ball.position * world_to_screen;
-        float screen_radius = ball.radius * world_to_screen.y; 
+        float screen_radius = ball.radius * world_to_screen.y;
         draw_list.AddCircleFilled(screen_pos, screen_radius, ball_color);
         draw_list.AddCircle(screen_pos, screen_radius, ball_outline_color);
     }
@@ -633,7 +738,8 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
 
 ArkanoidImpl::~ArkanoidImpl()
 {
-    for (int i = 0; i < bricks.size(); ++i) {
+    for (int i = 0; i < bricks.size(); ++i)
+    {
         for (int j = 0; j < bricks.size(); ++j)
             delete bricks[i][j];
 
@@ -647,15 +753,19 @@ void ArkanoidImpl::initialize_brick_collisions(ArkanoidDebugData& debug_data)
 {
     Ball ball = balls[0];
     debug_data.bricks_collisions.clear();
-    for (int i = 0; i < bricks.size(); ++i) {
+    for (int i = 0; i < bricks.size(); ++i)
+    {
         debug_data.bricks_collisions.push_back(std::vector<ArkanoidDebugData::BrickCollisionDebug>(bricks[i].size()));
-        for (int j = 0; j < bricks[i].size(); ++j) {
-            if (!bricks[i][j]) {
+        for (int j = 0; j < bricks[i].size(); ++j)
+        {
+            if (!bricks[i][j])
+            {
                 continue;
             }
 
             ArkanoidDebugData::BrickCollisionDebug coll;
-            for (int k = 0; k < 8; ++k) {
+            for (int k = 0; k < 8; ++k)
+            {
                 coll.screen_points[k] = bricks[i][j]->collision.points[k] * world_to_screen;
             }
 
@@ -672,7 +782,8 @@ void ArkanoidImpl::update_debug_brick_collision(ArkanoidDebugData& debug_data, i
     if (!bricks[i][j])
         return;
 
-    for (int k = 0; k < 8; ++k) {
+    for (int k = 0; k < 8; ++k)
+    {
         debug_data.bricks_collisions[i][j].screen_points[k] = bricks[i][j]->collision.points[k] * world_to_screen;
         debug_data.bricks_collisions[i][j].is_visible = bricks[i][j]->collision.visible;
     }
@@ -689,12 +800,15 @@ void ArkanoidImpl::add_debug_hit(ArkanoidDebugData& debug_data, const Vect& worl
 void ArkanoidImpl::update_all_debug_brick_collisions(ArkanoidDebugData& debug_data)
 {
     for (int i = 0; i < bricks.size(); ++i)
-        for (int j = 0; j < bricks[0].size(); ++j) {
-            if (!bricks[i][j]) {
+        for (int j = 0; j < bricks[0].size(); ++j)
+        {
+            if (!bricks[i][j])
+            {
                 continue;
             }
 
-            for (int k = 0; k < 8; ++k) {
+            for (int k = 0; k < 8; ++k)
+            {
                 debug_data.bricks_collisions[i][j].screen_points[k] = bricks[i][j]->collision.points[k] * world_to_screen;
             }
         }
@@ -712,31 +826,39 @@ void ArkanoidImpl::add_debug_aim_helper(ArkanoidDebugData& debug_data, float rad
 Vect ArkanoidImpl::next_hit(const Vect& position, const Vect& velocity, float radius)
 {
     // special cases
-    if (velocity.y == 0) {
+    if (velocity.y == 0)
+    {
         if (velocity.x > 0)
-            return { world_size.x, position.y };
+            return
+        { world_size.x, position.y };
         else
-            return { 0, position.y };
+            return
+        { 0, position.y };
     }
 
-    if (velocity.x == 0) {
+    if (velocity.x == 0)
+    {
         if (velocity.y > 0)
-            return { position.x, world_size.y };
+            return
+        { position.x, world_size.y };
         else
-            return { position.x, 0 };
+            return
+        { position.x, 0 };
     }
 
     float x = 0.0f;
     float y = 0.0f;
 
-    if (velocity.y < 0) {
+    if (velocity.y < 0)
+    {
         y = radius;
         x = ((y - position.y) * velocity.x + position.x * velocity.y) / velocity.y;
     } // upper
-    else if (velocity.y > 0){
+    else if (velocity.y > 0) {
         y = racket.position.y - radius;
         x = ((y - position.y) * velocity.x + position.x * velocity.y) / velocity.y;
-        if (x < racket.position.x || x > racket.position.x + racket.width) {
+        if (x < racket.position.x || x > racket.position.x + racket.width)
+        {
             y = world_size.y - radius;
             x = ((y - position.y) * velocity.x + position.x * velocity.y) / velocity.y;
         }
@@ -745,11 +867,13 @@ Vect ArkanoidImpl::next_hit(const Vect& position, const Vect& velocity, float ra
     if (x > radius * to_horizontal_radius && x < world_size.x - radius * to_horizontal_radius)
         return Vect(x, y);
 
-    if (velocity.x < 0) {
+    if (velocity.x < 0)
+    {
         x = radius * to_horizontal_radius;
         y = ((x - position.x) * velocity.y + position.y * velocity.x) / velocity.x;
     } // left
-    else if (velocity.x > 0) {
+    else if (velocity.x > 0)
+    {
         x = world_size.x - radius * to_horizontal_radius;
         y = ((x - position.x) * velocity.y + position.y * velocity.x) / velocity.x;
     } // right
@@ -760,15 +884,18 @@ Vect ArkanoidImpl::next_hit(const Vect& position, const Vect& velocity, float ra
 
 Vect ArkanoidImpl::calulate_bounce_vector(float speed, float width, float dist)
 {
-    float angle = fabsf((1 - (fabsf(dist) / (width * 0.5f))) * (0.5f * 3.14f )); // arkanoid paddle bounce formula
-    if (angle < 0.5f) {
+    float angle = fabsf((1 - (fabsf(dist) / (width * 0.5f))) * (0.5f * 3.14f)); // arkanoid paddle bounce formula
+    if (angle < 0.5f)
+    {
         angle = 0.5f;
     }
 
-    if (dist < 0) {
+    if (dist < 0)
+    {
         return speed * Vect(cos(angle) * cos(angle), -sin(angle) * sin(angle));
     }
-    else {
+    else
+    {
         return speed * Vect(-cos(angle) * cos(angle), -sin(angle) * sin(angle));
     }
 }
@@ -777,19 +904,23 @@ Vect ArkanoidImpl::find_intersection(Vect p1, Vect p2, Vect p3, Vect p4)
 {
     float d1 = (p2.y - p1.y) / (p2.x - p1.x);
     float d2 = (p4.y - p3.y) / (p4.x - p3.x);
-    if (p2.x == p1.x) {
-        if (p4.x == p3.x) {
+    if (p2.x == p1.x)
+    {
+        if (p4.x == p3.x)
+        {
             return Vect(0.0f, 0.0f);
         }
-        else {
+        else
+        {
             return Vect(p1.x, d2 * (p1.x - p3.x) + p3.y);
         }
     }
-    
-    if (p3.x == p4.x) {
+
+    if (p3.x == p4.x)
+    {
         return Vect(p3.x, d1 * (p3.x - p1.x) + p1.y);
     }
-    
+
     float x = ((d1 * p1.x) + p3.y - p1.y - d2 * p3.x) / (d1 - d2);
     float y = d1 * x - d1 * p1.x + p1.y;
     return Vect(x, y);
@@ -803,22 +934,26 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
     int min_i = (fminf(ball.position.y, prev_pos.y) - ball.radius - padding_playzone_from_top) / (brick_padding_y + brick_height);
     int max_i = (fmaxf(ball.position.y, prev_pos.y) + ball.radius - padding_playzone_from_top) / (brick_padding_y + brick_height) + 1;
     // ensuring row range safety
-    if (max_i >= bricks.size()) {
+    if (max_i >= bricks.size())
+    {
         max_i = bricks.size() - 1;
     }
 
-    if (min_i < 0) {
+    if (min_i < 0)
+    {
         min_i = 0;
     }
 
     int min_j = (fminf(ball.position.x, prev_pos.x) - ball.radius * to_horizontal_radius) / (brick_padding_x + brick_width);
     int max_j = (fmaxf(ball.position.x, prev_pos.x) + ball.radius * to_horizontal_radius) / (brick_padding_x + brick_width) + 1;
     // ensuring column range safety
-    if (max_j >= bricks[0].size()) {
+    if (max_j >= bricks[0].size())
+    {
         max_j = bricks[0].size() - 1;
     }
 
-    if (min_j < 0) {
+    if (min_j < 0)
+    {
         min_j = 0;
     }
 
@@ -826,17 +961,22 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
     // Step 2
     // Given the direction of the ball, 
     // check 8 sides in the hexagon collision corresponding to a brick and keep closest hit point
-    
+
     BrickHitData res;
     float dist = world_size.x * world_size.x + world_size.y * world_size.y;
+
     {
-        for (int i = min_i; i <= max_i; ++i) {
-            for (int j = min_j; j <= max_j; ++j) {
-                if (!bricks[i][j]) {
+        for (int i = min_i; i <= max_i; ++i)
+        {
+            for (int j = min_j; j <= max_j; ++j)
+            {
+                if (!bricks[i][j])
+                {
                     continue;
                 }
 
-                if (bricks[i][j]->hits_left < 1) {
+                if (bricks[i][j]->hits_left < 1)
+                {
                     continue;
                 }
 
@@ -851,11 +991,14 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 Vect p2 = bricks[i][j]->collision.points[1];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && (ball.velocity.x > 0 || ball.velocity.y > 0) && intersection.x > p2.x && intersection.x < p1.x && intersection.y < p2.y && intersection.y > p1.y) {
-                    if (ball.velocity.x < 0 || ball.velocity.y > 0 && intersection.y < bricks[i][j]->brick_pos.y - checker) {
+                if (dist < min_dist && dist < max_dist && (ball.velocity.x > 0 || ball.velocity.y > 0) && intersection.x > p2.x && intersection.x < p1.x && intersection.y < p2.y && intersection.y > p1.y)
+                {
+                    if (ball.velocity.x < 0 || ball.velocity.y > 0 && intersection.y < bricks[i][j]->brick_pos.y - checker)
+                    {
                         res.next_vect = Vect(1.0f, -1.0f);
                     }
-                    else {
+                    else
+                    {
                         res.next_vect = Vect(-1.0f, 1.0f);
                     }
 
@@ -869,7 +1012,8 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[2];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && ball.velocity.x > 0 && intersection.y > p1.y && intersection.y < p2.y) {
+                if (dist < min_dist && dist < max_dist && ball.velocity.x > 0 && intersection.y > p1.y && intersection.y < p2.y)
+                {
                     res.position = intersection;
                     res.next_vect = Vect(-1.0f, 1.0f);
                     min_dist = dist;
@@ -880,12 +1024,15 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[3];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && (ball.velocity.x >= 0 || ball.velocity.y <= 0) && intersection.x > p1.x && intersection.x < p2.x && intersection.y > p1.y && intersection.y < p2.y) {
+                if (dist < min_dist && dist < max_dist && (ball.velocity.x >= 0 || ball.velocity.y <= 0) && intersection.x > p1.x && intersection.x < p2.x && intersection.y > p1.y && intersection.y < p2.y)
+                {
                     res.position = intersection;
-                    if (ball.velocity.x < 0 || ball.velocity.y < 0 && intersection.y > bricks[i][j]->brick_pos.y + checker + bricks[i][j]->brick_size.y) {
+                    if (ball.velocity.x < 0 || ball.velocity.y < 0 && intersection.y > bricks[i][j]->brick_pos.y + checker + bricks[i][j]->brick_size.y)
+                    {
                         res.next_vect = Vect(1.0f, -1.0f);
                     }
-                    else {
+                    else
+                    {
                         res.next_vect = Vect(-1.0f, 1.0f);
                     }
 
@@ -897,7 +1044,8 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[4];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && ball.velocity.y < 0 && intersection.x > p1.x && intersection.x < p2.x) {
+                if (dist < min_dist && dist < max_dist && ball.velocity.y < 0 && intersection.x > p1.x && intersection.x < p2.x)
+                {
                     res.position = intersection;
                     res.next_vect = Vect(1.0f, -1.0f);
                     min_dist = dist;
@@ -908,12 +1056,15 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[5];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && (ball.velocity.x < 0 || ball.velocity.y < 0) && intersection.x > p1.x && intersection.x < p2.x && intersection.y > p2.y && intersection.y < p1.y) {
+                if (dist < min_dist && dist < max_dist && (ball.velocity.x < 0 || ball.velocity.y < 0) && intersection.x > p1.x && intersection.x < p2.x && intersection.y > p2.y && intersection.y < p1.y)
+                {
                     res.position = intersection;
-                    if (ball.velocity.x > 0 || ball.velocity.y < 0 && intersection.y > bricks[i][j]->brick_pos.y + checker + bricks[i][j]->brick_size.y) {
+                    if (ball.velocity.x > 0 || ball.velocity.y < 0 && intersection.y > bricks[i][j]->brick_pos.y + checker + bricks[i][j]->brick_size.y)
+                    {
                         res.next_vect = Vect(1.0f, -1.0f);
                     }
-                    else {
+                    else
+                    {
                         res.next_vect = Vect(-1.0f, 1.0f);
                     }
 
@@ -925,7 +1076,8 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[6];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && ball.velocity.x < 0 && intersection.y > p2.y && intersection.y < p1.y) {
+                if (dist < min_dist && dist < max_dist && ball.velocity.x < 0 && intersection.y > p2.y && intersection.y < p1.y)
+                {
                     res.position = intersection;
                     res.next_vect = Vect(-1.0f, 1.0f);
                     min_dist = dist;
@@ -936,11 +1088,14 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[7];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && (ball.velocity.x < 0 || ball.velocity.y > 0) && intersection.x > p2.x && intersection.x < p1.x && intersection.y > p2.y && intersection.y < p1.y) {
-                    if (ball.velocity.x > 0 || ball.velocity.y > 0 && intersection.y < bricks[i][j]->brick_pos.y - checker) {
+                if (dist < min_dist && dist < max_dist && (ball.velocity.x < 0 || ball.velocity.y > 0) && intersection.x > p2.x && intersection.x < p1.x && intersection.y > p2.y && intersection.y < p1.y)
+                {
+                    if (ball.velocity.x > 0 || ball.velocity.y > 0 && intersection.y < bricks[i][j]->brick_pos.y - checker)
+                    {
                         res.next_vect = Vect(1.0f, -1.0f);
                     }
-                    else {
+                    else
+                    {
                         res.next_vect = Vect(-1.0f, 1.0f);
                     }
 
@@ -953,13 +1108,15 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
                 p2 = bricks[i][j]->collision.points[0];
                 intersection = find_intersection(p1, p2, prev_pos, ball.position);
                 dist = dist_qdr(intersection, prev_pos);
-                if (dist < min_dist && dist < max_dist && ball.velocity.y > 0 && intersection.x > p2.x && intersection.x < p1.x) {
+                if (dist < min_dist && dist < max_dist && ball.velocity.y > 0 && intersection.x > p2.x && intersection.x < p1.x)
+                {
                     res.position = intersection;
                     res.next_vect = Vect(1.0f, -1.0f);
                     min_dist = dist;
                 }
 
-                if (min_dist != max_dist) {
+                if (min_dist != max_dist)
+                {
                     res.column = j;
                     res.row = i;
                     return res;
@@ -974,8 +1131,10 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
 void ArkanoidImpl::transform_collisions(float radius, float prev_trans, float new_trans)
 {
     for (int i = 0; i < bricks.size(); ++i)
-        for (int j = 0; j < bricks[0].size(); ++j) {
-            if (!bricks[i][j]) {
+        for (int j = 0; j < bricks[0].size(); ++j)
+        {
+            if (!bricks[i][j])
+            {
                 continue;
             }
 
@@ -988,7 +1147,8 @@ float ArkanoidImpl::dist_qdr(Vect p1, Vect p2)
     return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 }
 
-void ArkanoidImpl::spawn_ball() {
+void ArkanoidImpl::spawn_ball()
+{
     balls.push_back({
         Vect(racket.width / 2.0f + racket.position.x, racket.position.y - ball_radius),
         Vect(0.01 * ball_initial_speed, -ball_initial_speed),
@@ -1013,31 +1173,41 @@ void ArkanoidImpl::process_possible_explosion(int row, int column)
     if (!bricks[row][column])
         return;
 
-    if (bricks[row][column]->get_brick_type() == "ExplosiveBrick") {
-        ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[row][column])->type;
+    if (bricks[row][column]->get_brick_type() == BrickType::Explosive)
+    {
+        ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[row][column])->expl_type;
         int d = dynamic_cast<ExplosiveBrick*>(bricks[row][column])->explosion_dist;
         int damage = dynamic_cast<ExplosiveBrick*>(bricks[row][column])->damage;
-        if (type == Radial) {
-            for (int i = row - d; i < row + d + 1; ++i) {
+        if (type == ExplosionType::Radial)
+        {
+            for (int i = row - d; i < row + d + 1; ++i)
+            {
                 apply_explosion(i, column, damage);
             }
 
-            for (int j = column - d; j < column + d + 1; ++j) {
+            for (int j = column - d; j < column + d + 1; ++j)
+            {
                 apply_explosion(row, j, damage);
             }
         }
-        if (type == Vertical) {
-            for (int i = row - d * 2; i < row + d * 2 + 1; ++i) {
+        if (type == ExplosionType::Vertical)
+        {
+            for (int i = row - d * 2; i < row + d * 2 + 1; ++i)
+            {
                 apply_explosion(i, column, damage);
             }
         }
-        if (type == Horizontal) {
-            for (int j = column - d * 2; j < column + d * 2 + 1; ++j) {
+        if (type == ExplosionType::Horizontal)
+        {
+            for (int j = column - d * 2; j < column + d * 2 + 1; ++j)
+            {
                 apply_explosion(row, j, damage);
             }
         }
-        if (type == Diagonal) {
-            for (int i1 = -d; i1 < d + 1; ++i1) {
+        if (type == ExplosionType::Diagonal)
+        {
+            for (int i1 = -d; i1 < d + 1; ++i1)
+            {
                 apply_explosion(row + i1, column + i1, damage);
                 apply_explosion(row + i1, column - i1, damage);
             }
@@ -1047,20 +1217,25 @@ void ArkanoidImpl::process_possible_explosion(int row, int column)
 
 void ArkanoidImpl::apply_explosion(int i, int j, int damage)
 {
-    if (i < 0 || i > bricks.size() - 1 || j < 0 || j > bricks[i].size() - 1 || damage <= 0) {
+    if (i < 0 || i > bricks.size() - 1 || j < 0 || j > bricks[i].size() - 1 || damage <= 0)
+    {
         return;
     }
 
-    if (!bricks[i][j]) {
+    if (!bricks[i][j])
+    {
         return;
     }
 
-    if (bricks[i][j]->hits_left > 0) {
+    if (bricks[i][j]->hits_left > 0)
+    {
         --bricks[i][j]->hits_left;
-        if (bricks[i][j]->hits_left == 0) {
+        if (bricks[i][j]->hits_left == 0)
+        {
             process_possible_explosion(i, j);
             score += bricks[i][j]->score;
-            if (bricks[i][j]->ticks_before_explosion == -1) {
+            if (bricks[i][j]->ticks_before_explosion == -1)
+            {
                 bricks[i][j]->ticks_before_explosion = ticks_before_explosion;
                 ++affected_by_explosion;
             }
@@ -1070,31 +1245,38 @@ void ArkanoidImpl::apply_explosion(int i, int j, int damage)
 
 void ArkanoidImpl::destroy_brick(int i, int j)
 {
-    if (i < 0 || i > bricks.size() - 1 || j < 0 || j > bricks[i].size() - 1) {
+    if (i < 0 || i > bricks.size() - 1 || j < 0 || j > bricks[i].size() - 1)
+    {
         return;
     }
 
-    if (!bricks[i][j]) {
+    if (!bricks[i][j])
+    {
         return;
     }
 
-    if (bricks[i][j]->score == 100) {
+    if (bricks[i][j]->score == 100)
+    {
         ++bricks_destroyed_100;
     }
-    else if (bricks[i][j]->score == 200) {
+    else if (bricks[i][j]->score == 200)
+    {
         ++bricks_destroyed_200;
     }
-    else if (bricks[i][j]->score == 300) {
+    else if (bricks[i][j]->score == 300)
+    {
         ++bricks_destroyed_300;
     }
 
     --bricks_left;
-    if (bricks[i][j]->get_brick_type() == "ExplosiveBrick") {
+    if (bricks[i][j]->get_brick_type() == BrickType::Explosive)
+    {
         ++explosive_bricks_destroyed;
     }
 
     int chance = bonus_drop_chance * 100;
-    if (rand() % 100 < chance) {
+    if (rand() % 100 < chance)
+    {
         spawn_bonus_from_brick(*bricks[i][j]);
     }
 
@@ -1104,25 +1286,32 @@ void ArkanoidImpl::destroy_brick(int i, int j)
 
 void ArkanoidImpl::execute_bonus(const Bonus& bonus)
 {
-    if (bonus.type == AnotherBall && balls.size() < max_balls) {
+    if (bonus.type == BonusType::AnotherBall && balls.size() < max_balls)
+    {
         spawn_ball();
     }
-    else if (bonus.type == ExtraLife && lives < max_lives) {
+    else if (bonus.type == BonusType::ExtraLife && lives < max_lives)
+    {
         ++lives;
     }
-    else if (bonus.type == TurnBrickIntoExplosive) {
+    else if (bonus.type == BonusType::TurnBrickIntoExplosive)
+    {
         turn_random_brick_to_random_explosive(bricks.size(), bricks[0].size());
     }
-    else if (bonus.type == Jackpot) {
+    else if (bonus.type == BonusType::Jackpot)
+    {
         jackpot();
     }
 }
 
 void ArkanoidImpl::jackpot()
 {
-    for (int i = 0; i < bricks.size(); ++i) {
-        for (int j = 0; j < bricks[0].size(); ++j) {
-            if (bricks[i][j]) {
+    for (int i = 0; i < bricks.size(); ++i)
+    {
+        for (int j = 0; j < bricks[0].size(); ++j)
+        {
+            if (bricks[i][j])
+            {
                 bricks[i][j]->score = 300;
             }
         }
@@ -1135,10 +1324,13 @@ void ArkanoidImpl::turn_random_brick_to_random_explosive(int rows, int columns)
 
     // take random brick from every row and check if it is valid for transformation
     int terminate_counter = 100; // tries to choose the brick, chances of it not succeeding
-    while (possibilities.size() == 0 && terminate_counter > 0) {
-        for (int i = 0; i < rows; ++i) {
+    while (possibilities.size() == 0 && terminate_counter > 0)
+    {
+        for (int i = 0; i < rows; ++i)
+        {
             int rand_j = rand() % columns;
-            if (bricks[i][rand_j] && bricks[i][rand_j]->get_brick_type() != "ExplosiveBrick") {
+            if (bricks[i][rand_j] && bricks[i][rand_j]->get_brick_type() != BrickType::Explosive)
+            {
                 possibilities.push_back({ i, rand_j });
             }
         }
@@ -1146,7 +1338,8 @@ void ArkanoidImpl::turn_random_brick_to_random_explosive(int rows, int columns)
         --terminate_counter;
     }
 
-    if (terminate_counter) {
+    if (terminate_counter)
+    {
         int k = rand() % possibilities.size();
         int i = possibilities[k].first;
         int j = possibilities[k].second;
@@ -1154,10 +1347,12 @@ void ArkanoidImpl::turn_random_brick_to_random_explosive(int rows, int columns)
         ExplosiveBrick brick(*bricks[i][j]);
         delete bricks[i][j]; // if we use destroy_brick here, it can spawn a bonus that will shift the iteration which is LETHAL
         bricks[i][j] = new ExplosiveBrick(brick);
-        dynamic_cast<ExplosiveBrick*>(bricks[i][j])->type = static_cast<ExplosionType>(rand() % 4);
+        dynamic_cast<ExplosiveBrick*>(bricks[i][j])->expl_type = static_cast<ExplosionType>(rand() % 4);
         dynamic_cast<ExplosiveBrick*>(bricks[i][j])->explosion_dist = 1;
         dynamic_cast<ExplosiveBrick*>(bricks[i][j])->damage = 1;
     }
     else
+    {
         score += 1000 * score_multiplier;
+    }
 }
