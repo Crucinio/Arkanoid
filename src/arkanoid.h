@@ -7,8 +7,8 @@
 struct ArkanoidSettings
 {
     // Display
-    float display_w;
-    float display_h;
+    float display_w; //todo default value
+    float display_h; //todo default value
 
     // World
     bool show_world_settings = false;
@@ -96,15 +96,15 @@ struct ArkanoidDebugData
     };
 
     struct AimHelper {
-        float screen_radius;
         Vect screen_p1;
         Vect screen_p2;
         Vect screen_p3 = Vect(0.0f);
+        float screen_radius;
     };
 
     struct BrickCollisionDebug {
         std::array<Vect, 8> screen_points;
-        bool is_visible = true;
+        bool is_visible = true; //todo rename visible
     };
     
     bool god_mode = false;
@@ -119,6 +119,7 @@ class Arkanoid
 {
 protected:
     bool game_over = false;
+
 public:
     virtual ~Arkanoid() = default;
     // added debug data to initialise brick collisions
@@ -126,6 +127,7 @@ public:
     virtual void draw(ImGuiIO& io, ImDrawList& draw_list) = 0;
     virtual void update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elapsed) = 0;
 
+    //todo обычно пишут на bool метод, is -> is_game_over() ...
     bool get_game_over() { return game_over; };
 };
 
