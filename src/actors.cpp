@@ -12,9 +12,9 @@ Brick::BrickCollision::BrickCollision(const Brick& brick, float radius, float to
     points[7] = points[6] + Vect(-radius * to_horizontal_radius, -radius);
 }
 
-void Brick::BrickCollision::to_new_horizontal_radius(float radius, float prev_trans, float trans_radius)
+void Brick::BrickCollision::update(float radius, float prev_radius_multiplier_x, float new_radius_multiplier_x)
 {
-    float diff = radius * (prev_trans - trans_radius);
+    float diff = radius * (prev_radius_multiplier_x - new_radius_multiplier_x);
     points[1].x += diff;
     points[2].x += diff;
     points[5].x -= diff;

@@ -30,9 +30,8 @@ struct Brick {
         BrickCollision(const Brick& brick, float radius, float to_horizontal_radius);
 
         std::array<Vect, 8> points;
-        bool is_visible = true; //todo rename to visible
-        void to_new_horizontal_radius(float rad, /*rad -> radius, one name in all places */ float prev_trans, float trans_radius);
-        //todo alter name? to_new_horizontal_radius -> update(float radius, float prev_radius_multiplier, float new_radius_multiplier); 
+        bool visible = true; //todo rename to visible
+        void update(float radius, float prev_radius_multiplier_x, float new_radius_multiplier_x);
    };
 
     Brick() = default;
@@ -69,7 +68,7 @@ struct Ball {
     float initial_speed = 0.0f;
     float speed = 0;
 
-    bool is_active = true; //todo rename to active
+    bool active = true; //todo rename to active
     bool on_start = true;
 };
 

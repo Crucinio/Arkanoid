@@ -18,8 +18,6 @@ struct BrickHitData {
     int column = 0;
 };
 
-
-
 class ArkanoidImpl : public Arkanoid
 {
 public:
@@ -45,7 +43,6 @@ private:
     BrickHitData process_brick_hit(Ball& ball, Vect prev_pos);
     void transform_collisions(float radius, float prev_trans, float new_trans);
     void spawn_ball();
-    void spawn_ball(Vect pos);
     void spawn_bonus_from_brick(const Brick& brick);
     void process_possible_explosion(int i, int j);
     void apply_explosion(int i, int j, int damage);
@@ -57,7 +54,6 @@ private:
     // algebra
     Vect calulate_bounce_vector(float speed, float width, float dist);
     Vect find_intersection(Vect p1, Vect p2, Vect p3, Vect p4);
-    float dist(Vect p1, Vect p2);
     float dist_qdr(Vect p1, Vect p2);
     
 

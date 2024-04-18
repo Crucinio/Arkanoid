@@ -62,8 +62,6 @@ int main(int, char**)
     if (window == NULL)
         return 1;
 
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -140,8 +138,9 @@ int main(int, char**)
                 } // bruh
 
                 
-                if (arkanoid_settings.world_size.y < arkanoid_settings.ball_radius * 2.0f + arkanoid_settings.ball_speed * 0.3f + 50.0f)
+                if (arkanoid_settings.world_size.y < arkanoid_settings.ball_radius * 2.0f + arkanoid_settings.ball_speed * 0.3f + 50.0f) {
                     arkanoid_settings.world_size.y = arkanoid_settings.ball_radius * 2.0f + arkanoid_settings.ball_speed * 0.3f + 50.0f; // meh
+                }
             }
 
             // Bricks
@@ -200,8 +199,9 @@ int main(int, char**)
                 ImGui::SliderInt("Hits to break brick", &arkanoid_settings.hits_for_brick_to_destroy, ArkanoidSettings::hits_for_brick_to_destroy_min, ArkanoidSettings::hits_for_brick_to_destroy_max);
             }
 
-            if ((arkanoid->get_game_over() && io.KeysDown[GLFW_KEY_ENTER]) || ImGui::Button("Reset"))
+            if ((arkanoid->get_game_over() && io.KeysDown[GLFW_KEY_ENTER]) || ImGui::Button("Reset")) {
                 arkanoid->reset(arkanoid_settings, arkanoid_debug_data);
+            }
 
             ImGui::End();
         }
@@ -226,11 +226,13 @@ int main(int, char**)
             ImGui::Spacing();
             ImGui::Checkbox("Steps by step", &arkanoid_settings.step_by_step);
 
-            if (arkanoid_settings.step_by_step)
+            if (arkanoid_settings.step_by_step) {
                 do_arkanoid_update = false;
+            }
 
-            if (ImGui::Button("Next step (SPACE Key)") || io.KeysDown[GLFW_KEY_SPACE])
+            if (ImGui::Button("Next step (SPACE Key)") || io.KeysDown[GLFW_KEY_SPACE]) {
                 do_arkanoid_update = true;
+            }
 
             ImGui::End();
         }
@@ -261,8 +263,9 @@ int main(int, char**)
                 for(auto& hit : arkanoid_debug_data.hits)
                 {
                     hit.time += elapsed_time;
-                    if(hit.time > arkanoid_settings.debug_draw_timeout)
+                    if (hit.time > arkanoid_settings.debug_draw_timeout) {
                         remove_by_timeout_count++;
+                    }
                 }
                 
                 // clear outdated debug info
@@ -299,10 +302,11 @@ int main(int, char**)
             if (arkanoid_settings.draw_brick_radials) {
                 for (int i = 0; i < arkanoid_debug_data.bricks_collisions.size(); ++i)
                     for (int j = 0; j < arkanoid_debug_data.bricks_collisions[0].size(); ++j) {
-                        if (arkanoid_debug_data.bricks_collisions[i][j].is_visible)
-                            for (int k = 0; k < 8; ++k)
+                        if (arkanoid_debug_data.bricks_collisions[i][j].is_visible) {
+                            for (int k = 0; k < 8; ++k) {
                                 bg_drawlist->AddLine(arkanoid_debug_data.bricks_collisions[i][j].screen_points[k], arkanoid_debug_data.bricks_collisions[i][j].screen_points[(k + 1) % 8], ImColor(0, 255, 0));
-                            
+                            }
+                        }
                     }
             }
         }
