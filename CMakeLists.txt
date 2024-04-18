@@ -27,7 +27,7 @@ set(GLFW_INSTALL OFF CACHE BOOL "Generate installation target")
 add_subdirectory(${glfw_out_path} glfw_binary)
 
 # glad
-add_library(glad STATIC ${glfw_out_path}/deps/glad_gl.c)
+add_library(glad STATIC ${glfw_out_path}/deps/glad_gl.c "src/actors.h")
 target_include_directories(glad PUBLIC ${glfw_out_path}/deps/)
 
 # imgui with glfw + opengl3 backend
@@ -39,7 +39,7 @@ add_library(imgui STATIC
    ${imgui_out_path}/imgui_widgets.cpp
    ${imgui_out_path}/backends/imgui_impl_glfw.cpp
    ${imgui_out_path}/backends/imgui_impl_opengl3.cpp
-)
+ "src/actors.h")
 
 target_include_directories(imgui PUBLIC 
    ${imgui_out_path}
@@ -57,7 +57,7 @@ file(GLOB srcs
 
 find_package(OpenGL REQUIRED)
 
-add_executable(${CMAKE_PROJECT_NAME} ${srcs})
+add_executable(${CMAKE_PROJECT_NAME} ${srcs} "src/actors.h")
 
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
