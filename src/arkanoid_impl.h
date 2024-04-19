@@ -104,7 +104,7 @@ private:
     // specials
     float world_to_screen_diff_xy = 0.0f;
     float to_horizontal_radius = 0.0f; // specail for ball hits
-    const float spec = 0.5f;
+    const float spec = 0.5f; // racket calc
 
     // drawing
     const std::unordered_map<int, ImColor> score_to_color = {
