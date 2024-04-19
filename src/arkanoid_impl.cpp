@@ -571,58 +571,58 @@ void ArkanoidImpl::draw(ImGuiIO& io, ImDrawList &draw_list)
     }
 
     // drawing bricks
-    for (int i = 0; i < bricks.size(); ++i)
-    {
-        for (int j = 0; j < bricks[0].size(); ++j)
+    for (auto& i : bricks)
+        for (auto& brick : i)
         {
-            if (!bricks[i][j])
+            if (!brick.get())
                 continue;
 
-            if (bricks[i][j]->hits_left > 0 && bricks[i][j]->ticks_before_explosion <= 0)
+            if (brick->hits_left > 0 && brick->ticks_before_explosion <= 0)
             {
-                draw_list.AddRectFilled(bricks[i][j]->position * world_to_screen, (bricks[i][j]->position + bricks[i][j]->size) * world_to_screen, score_to_color.at(bricks[i][j]->score));
-                if (bricks[i][j]->get_brick_type() == BrickType::Explosive)
+                draw_list.AddRectFilled(brick->position * world_to_screen, (brick->position + brick->size) * world_to_screen, score_to_color.at(brick->score));
+                if (brick->get_brick_type() == BrickType::Explosive)
                 {
-                    ExplosionType type = dynamic_cast<ExplosiveBrick*>(bricks[i][j].get())->explosion_type;
+                    ExplosionType type = dynamic_cast<ExplosiveBrick*>(brick.get())->explosion_type;
                     if (type == ExplosionType::Radial) 
                     {
-                        draw_list.AddCircleFilled((bricks[i][j]->position + bricks[i][j]->size / 2.0f) * world_to_screen, bricks[i][j]->size.y * world_to_screen.y / 3.0f, ImColor(0, 0, 0));
+                        draw_list.AddCircleFilled((brick->position + brick->size / 2.0f) * world_to_screen, brick->size.y * world_to_screen.y / 3.0f, ImColor(0, 0, 0));
                     }
                     else if (type == ExplosionType::Diagonal)
                     {
-                        draw_list.AddLine(bricks[i][j]->position * world_to_screen, (bricks[i][j]->position + bricks[i][j]->size) * world_to_screen, ImColor(0, 0, 0), 2.0f);
-                        draw_list.AddLine((bricks[i][j]->position + Vect(0, bricks[i][j]->size.y)) * world_to_screen, (bricks[i][j]->position + Vect(bricks[i][j]->size.x, 0)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
+                        draw_list.AddLine(brick->position * world_to_screen, (brick->position + brick->size) * world_to_screen, ImColor(0, 0, 0), 2.0f);
+                        draw_list.AddLine((brick->position + Vect(0, brick->size.y)) * world_to_screen, (brick->position + Vect(brick->size.x, 0)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
                     }
                     else if (type == ExplosionType::Horizontal)
                     {
-                        draw_list.AddLine((bricks[i][j]->position + Vect(0, bricks[i][j]->size.y / 2.0f)) * world_to_screen, (bricks[i][j]->position + Vect(bricks[i][j]->size.x, bricks[i][j]->size.y / 2.0f)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
+                        draw_list.AddLine((brick->position + Vect(0, brick->size.y / 2.0f)) * world_to_screen, (brick->position + Vect(brick->size.x, brick->size.y / 2.0f)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
                     }
                     else if (type == ExplosionType::Vertical)
                     {
-                        draw_list.AddLine((bricks[i][j]->position + Vect(bricks[i][j]->size.x / 2.0f, 0)) * world_to_screen, (bricks[i][j]->position + Vect(bricks[i][j]->size.x / 2.0f, bricks[i][j]->size.y)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
+                        draw_list.AddLine((brick->position + Vect(brick->size.x / 2.0f, 0)) * world_to_screen, (brick->position + Vect(brick->size.x / 2.0f, brick->size.y)) * world_to_screen, ImColor(0, 0, 0), 2.0f);
 
                     }
                 }
             }
-            else if (bricks[i][j]->ticks_before_explosion > 0)
-                draw_list.AddRectFilled(bricks[i][j]->position * world_to_screen, (bricks[i][j]->position + bricks[i][j]->size) * world_to_screen, ImColor(255, 0, 0));
+            else if (brick->ticks_before_explosion > 0)
+                draw_list.AddRectFilled(brick->position * world_to_screen, (brick->position + brick->size) * world_to_screen, ImColor(255, 0, 0));
         }
-    }
 
     // drawing bonuses
-    for (int i = 0; i < bonuses.size(); ++i)
+    
+    for (auto& bonus : bonuses)
     {
-        draw_list.AddRectFilled(bonuses[i].position * world_to_screen, (bonuses[i].position + bonuses[i].size) * world_to_screen, bonus_color);
-        if (bonuses[i].type == BonusType::AnotherBall)
-            draw_list.AddCircleFilled((bonuses[i].position + bonuses[i].size / 2.0f) * world_to_screen, bonuses[i].size.x / 4.0f, inner_bonus);
-        else if (bonuses[i].type == BonusType::ExtraLife)
-            draw_list.AddText(nullptr, text_size * 2, ((bonuses[i].position + bonuses[i].size / 2.0f) - Vect(padding_x, text_size)) * world_to_screen, inner_bonus, "+ 1");
-        else if (bonuses[i].type == BonusType::Jackpot)
-            draw_list.AddCircleFilled((bonuses[i].position + bonuses[i].size / 2.0f) * world_to_screen, bonuses[i].size.x / 4.0f, score_to_color.at(300));
-        else if (bonuses[i].type == BonusType::TurnBrickIntoExplosive)
-            draw_list.AddText(nullptr, text_size * 2, ((bonuses[i].position + bonuses[i].size / 2.0f) - Vect(padding_x, text_size)) * world_to_screen, inner_bonus, "BOOM");
+        float inner_circle_radius = bonus.size.y / 4.0f;
+        draw_list.AddRectFilled(bonus.position * world_to_screen, (bonus.position + bonus.size) * world_to_screen, bonus_color);
+        if (bonus.type == BonusType::AnotherBall)
+            draw_list.AddCircleFilled((bonus.position + bonus.size / 2.0f) * world_to_screen, inner_circle_radius * world_to_screen.y , inner_bonus);
+        else if (bonus.type == BonusType::ExtraLife)
+            draw_list.AddText(nullptr, text_size * 2, ((bonus.position + bonus.size / 2.0f) - Vect(padding_x, text_size)) * world_to_screen, inner_bonus, "+ 1");
+        else if (bonus.type == BonusType::Jackpot)
+            draw_list.AddCircleFilled((bonus.position + bonus.size / 2.0f) * world_to_screen, inner_circle_radius * world_to_screen.y, score_to_color.at(300));
+        else if (bonus.type == BonusType::TurnBrickIntoExplosive)
+            draw_list.AddText(nullptr, text_size * 2, ((bonus.position + bonus.size / 2.0f) - Vect(padding_x, text_size)) * world_to_screen, inner_bonus, "BOOM");
 
-        draw_list.AddRect(bonuses[i].position * world_to_screen, (bonuses[i].position + bonuses[i].size) * world_to_screen, inner_bonus, 0, 0, (4.0f * world_to_screen.y / world_scale.y));
+        draw_list.AddRect(bonus.position * world_to_screen, (bonus.position + bonus.size) * world_to_screen, inner_bonus, 0, 0, (4.0f * world_to_screen.y / world_scale.y));
     }
 
     // drawing carriege
@@ -947,13 +947,13 @@ BrickHitData ArkanoidImpl::process_brick_hit(Ball& ball, Vect prev_pos)
 
 void ArkanoidImpl::update_collision_scaling(float radius, float prev_trans, float new_trans)
 {
-    for (int i = 0; i < bricks.size(); ++i)
-        for (int j = 0; j < bricks[0].size(); ++j)
+    for (auto& row : bricks)
+        for (auto& brick : row)
         {
-            if (!bricks[i][j])
+            if (!brick.get())
                 continue;
 
-            bricks[i][j]->collision.update(radius, prev_trans, new_trans);
+            brick->collision.update(radius, prev_trans, new_trans);
         }
 }
 
@@ -1099,10 +1099,10 @@ void ArkanoidImpl::execute_bonus(const Bonus& bonus)
 
 void ArkanoidImpl::jackpot()
 {
-    for (int i = 0; i < bricks.size(); ++i)
-        for (int j = 0; j < bricks[0].size(); ++j)
-            if (bricks[i][j])
-                bricks[i][j]->score = 300;
+    for (auto& i : bricks)
+        for (auto& j : i)
+            if (j.get())
+                j->score = 300;
 }
 
 void ArkanoidImpl::turn_random_brick_to_random_explosive(int rows, int columns)
@@ -1148,5 +1148,3 @@ void ArkanoidImpl::endgame_clear()
     lives = 0;
     racket.position = Vect(world_size.x * 0.5f, racket.position.y) - Vect(racket.width * 0.5f, 0);
 }
-
-

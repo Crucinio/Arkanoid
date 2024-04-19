@@ -134,6 +134,12 @@ int main(int, char**)
             if (arkanoid_settings.show_world_settings) 
             {
                 ImGui::InputFloat2("World size", arkanoid_settings.world_size.data_);
+                if (arkanoid_settings.world_size.x > 1e8)
+                    arkanoid_settings.world_size.x = 1e8;
+
+                if (arkanoid_settings.world_size.y > 1e8)
+                    arkanoid_settings.world_size.y = 1e8;
+
                 if (arkanoid_settings.world_size.x < arkanoid_settings.racket_width_min)
                     arkanoid_settings.world_size.x = arkanoid_settings.racket_width_min;
 
