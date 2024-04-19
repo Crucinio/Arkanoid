@@ -207,7 +207,7 @@ int main(int, char**)
                 ImGui::SliderInt("Hits to break brick", &arkanoid_settings.hits_for_brick_to_destroy, ArkanoidSettings::hits_for_brick_to_destroy_min, ArkanoidSettings::hits_for_brick_to_destroy_max);
             }
 
-            if ((arkanoid->get_game_over() && io.KeysDown[GLFW_KEY_ENTER]) || ImGui::Button("Reset")) 
+            if ((arkanoid->is_game_over() && io.KeysDown[GLFW_KEY_ENTER]) || ImGui::Button("Reset")) 
             {
                 arkanoid->reset(arkanoid_settings, arkanoid_debug_data);
             }

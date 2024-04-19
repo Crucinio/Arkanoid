@@ -1142,6 +1142,29 @@ void ArkanoidImpl::transform_collisions(float radius, float prev_trans, float ne
         }
 }
 
+Brick* ArkanoidImpl::create_brick(Vect position, Vect size, BrickType type)
+{
+    Brick* brick;
+
+    if (type == BrickType::Explosive) {
+        brick = new ExplosiveBrick();
+        dynamic_cast<ExplosiveBrick*>(brick)->expl_type = static_cast<ExplosionType>(rand() % 4);
+    }
+    else 
+    {
+        brick = new Brick();
+    }
+
+    // before collision creation!!!
+    brick->brick_pos = position;
+    brick->brick_size = size;
+
+    // creation
+    brick->collision = Brick::BrickCollision(*brick, ball_radius, to_horizontal_radius);
+    return brick;
+}
+
+
 float ArkanoidImpl::dist_qdr(Vect p1, Vect p2)
 {
     return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
@@ -1356,3 +1379,5 @@ void ArkanoidImpl::turn_random_brick_to_random_explosive(int rows, int columns)
         score += 1000 * score_multiplier;
     }
 }
+
+

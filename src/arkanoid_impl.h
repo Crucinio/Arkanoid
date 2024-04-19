@@ -43,6 +43,7 @@ private:
     Vect next_hit(const Vect& pos, const Vect& velocity, float radius);
     BrickHitData process_brick_hit(Ball& ball, Vect prev_pos);
     void transform_collisions(float radius, float prev_trans, float new_trans);
+    Brick* create_brick(Vect position, Vect size, BrickType type); // factory method to keep track of the init. sequence (pos + size before collision)
     void spawn_ball();
     void spawn_bonus_from_brick(const Brick& brick);
     void process_possible_explosion(int i, int j);
@@ -51,6 +52,8 @@ private:
     void execute_bonus(const Bonus& bonus);
     void jackpot(); // all bricks -> 300p
     void turn_random_brick_to_random_explosive(int rows, int columns);
+
+    void initiate_game_over();
 
     // algebra
     Vect calulate_bounce_vector(float speed, float width, float dist);

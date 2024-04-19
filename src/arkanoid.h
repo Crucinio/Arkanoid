@@ -128,7 +128,7 @@ public:
     virtual void update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elapsed) = 0;
 
     //todo обычно пишут на bool метод, is -> is_game_over() ...
-    bool get_game_over() { return game_over; };
+    bool is_game_over() { return game_over; };
 };
 
 extern Arkanoid* create_arkanoid();
