@@ -32,7 +32,6 @@ struct ArkanoidSettings
     static constexpr float bricks_columns_padding_max = 20.0f;
     static constexpr float bricks_rows_padding_min = 5.0f;
     static constexpr float bricks_rows_padding_max = 20.0f;
-
    
     static constexpr float explosive_brick_chance_min = 0.0f;
     static constexpr float explosive_brick_chance_max = 1.0f;
@@ -90,21 +89,47 @@ struct ArkanoidDebugData
 {
     struct Hit
     {
+        Hit() = default;
+        Hit(Vect position, Vect _normal) {
+            screen_pos = position;
+            normal = _normal;
+        }
+
         Vect screen_pos;        // Hit position, in screen space
         Vect normal;            // Hit normal
         float time = 0.0f;      // leave it default
     };
 
     struct AimHelper {
+        AimHelper() = default;
+        AimHelper(Vect p1, Vect p2, float radius) {
+            screen_p1 = p1;
+            screen_p2 = p2;
+            screen_radius = radius;
+        }
+
+        // points in screen
         Vect screen_p1;
         Vect screen_p2;
         Vect screen_p3 = Vect(0.0f);
+
+        // radius of ball simulation
         float screen_radius;
     };
 
     struct BrickCollisionDebug {
+        BrickCollisionDebug() = default;
+        BrickCollisionDebug(const std::array<Vect, 8>& brick_points, const Vect& world_to_screen, bool _visible)
+        {
+            for (int i = 0; i < 8; ++i)
+                screen_points[i] = brick_points[i] * world_to_screen;
+
+            visible = _visible;
+        }
+
+        BrickCollisionDebug(bool _visible) { visible = _visible; }
         std::array<Vect, 8> screen_points;
-        bool is_visible = true; //todo rename visible
+        bool visible = false;
     };
     
     bool god_mode = false;
@@ -126,8 +151,6 @@ public:
     virtual void reset(const ArkanoidSettings& settings, ArkanoidDebugData& debug_data) = 0;
     virtual void draw(ImGuiIO& io, ImDrawList& draw_list) = 0;
     virtual void update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elapsed) = 0;
-
-    //todo обычно пишут на bool метод, is -> is_game_over() ...
     bool is_game_over() { return game_over; };
 };
 

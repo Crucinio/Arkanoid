@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <string>
 
-
-
 // data about the ball-brick hit
 struct BrickHitData 
 {
@@ -23,43 +21,42 @@ class ArkanoidImpl : public Arkanoid
 {
 public:
     // general
-    void reset(const ArkanoidSettings& settings, ArkanoidDebugData& debug_data) override;
-    void update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elapsed) override;
-    void draw(ImGuiIO& io, ImDrawList& draw_list) override;
     ArkanoidImpl() = default;
     ~ArkanoidImpl(); // for bricks
 
     ArkanoidImpl(ArkanoidImpl& other) = delete;
     void operator = (ArkanoidImpl& other) = delete;
+
+    void reset(const ArkanoidSettings& settings, ArkanoidDebugData& debug_data) override;
+    void update(ImGuiIO& io, ArkanoidDebugData& debug_data, float elapsed) override;
+    void draw(ImGuiIO& io, ImDrawList& draw_list) override;
+
 private:
     // debug
-    void initialize_brick_collisions(ArkanoidDebugData& debug_data);
     void update_debug_brick_collision(ArkanoidDebugData& debug_data, int i, int j);
     void update_all_debug_brick_collisions(ArkanoidDebugData& debug_data);
     void add_debug_hit(ArkanoidDebugData& debug_data, const Vect& pos, const Vect& normal);
     void add_debug_aim_helper(ArkanoidDebugData& debug_data, float rad, const Vect& pos, const Vect& prediction);
 
     // logic
-    Vect next_hit(const Vect& pos, const Vect& velocity, float radius);
-    BrickHitData process_brick_hit(Ball& ball, Vect prev_pos);
-    void transform_collisions(float radius, float prev_trans, float new_trans);
+    Vect next_hit(const Vect& pos, const Vect& velocity, float radius); // calculates next hit
+    BrickHitData process_brick_hit(Ball& ball, Vect prev_pos); // brick hit processing
+    void update_collision_scaling(float radius, float prev_trans, float new_trans);
     Brick* create_brick(Vect position, Vect size, BrickType type); // factory method to keep track of the init. sequence (pos + size before collision)
     void spawn_ball();
-    void spawn_bonus_from_brick(const Brick& brick);
-    void process_possible_explosion(int i, int j);
-    void apply_explosion(int i, int j, int damage);
-    void destroy_brick(int i, int j);
-    void execute_bonus(const Bonus& bonus);
+    void spawn_bonus_from_brick(const Brick& brick); // spawns a ball at brick_pos
+    void process_possible_explosion(int i, int j); // on brick destruction, checks if it was an explosive brick and processes it
+    void apply_explosion(int i, int j, int damage); // applies explosion ticks if lives < 0 after taking damage
+    void destroy_brick(ArkanoidDebugData& debug_data, int i, int j); // in-game brick destruction handler
+    void execute_bonus(const Bonus& bonus); // bonus handler
     void jackpot(); // all bricks -> 300p
-    void turn_random_brick_to_random_explosive(int rows, int columns);
-
-    void initiate_game_over();
+    void turn_random_brick_to_random_explosive(int rows, int columns); // tries t0 choose a non-explosive brick for 100 times until such a brick is found
+    void endgame_clear(); // clearing actors and positioning the racket
 
     // algebra
-    Vect calulate_bounce_vector(float speed, float width, float dist);
-    Vect find_intersection(Vect p1, Vect p2, Vect p3, Vect p4);
-    float dist_qdr(Vect p1, Vect p2);
-    
+    Vect calulate_bounce_vector(float speed, float width, float dist); // bounce from racket
+    Vect find_intersection(Vect p1, Vect p2, Vect p3, Vect p4); // 2 lines L1(p1, p2), L2(p3, p4)
+    float dist_qdr(Vect p1, Vect p2); // (distance(p1, p2) ^ 2)
 
     // statistics
     int bricks_at_start = 0;
@@ -71,7 +68,6 @@ private:
     int affected_by_explosion = 0;
     long long ball_hits = 0;
 
-
     // game mode state
     bool game_start = true;
     bool multiplier_on = true;
@@ -79,7 +75,7 @@ private:
     int max_lives = 5;
     int max_balls = 3;
     int hits_to_destroy = 1;
-    const int ticks_before_explosion = 5;
+    const int ticks_before_explosion = 7;
     float score_multiplier = 1.0f;
     float muliplier_from_speed = 0;
     float multiplier_from_racket_width = 0;
@@ -94,12 +90,11 @@ private:
     float bonus_falling_speed = 200.0f;
     float bonus_drop_chance = 0.02f;
 
-
     //actors
     Racket racket;
     std::vector<Ball> balls;
     std::vector<Bonus> bonuses;
-    std::vector<std::vector<Brick*> > bricks;
+    std::vector<std::vector<std::unique_ptr<Brick> > > bricks;
 
     // world
     Vect world_size = Vect(0.0f);
@@ -117,6 +112,7 @@ private:
         {200, ImColor(80, 100, 180)},
         {300, ImColor(255, 200, 0)}
     };
+
     const ImColor my_text_color = ImColor(255, 255, 200);
     const ImColor new_record_color = ImColor(255, 215, 0);
     const ImColor ball_color = ImColor(100, 100, 200);

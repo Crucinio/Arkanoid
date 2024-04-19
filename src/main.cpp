@@ -178,7 +178,6 @@ int main(int, char**)
                 ImGui::SliderFloat("Ball speed", &arkanoid_settings.ball_speed, ArkanoidSettings::ball_speed_min, ArkanoidSettings::ball_speed_max);
             }
 
-
             // Carriege
             ImGui::Spacing();
             ImGui::Checkbox("Show racket settings", &arkanoid_settings.show_carriege_settings);
@@ -308,7 +307,7 @@ int main(int, char**)
             if (arkanoid_settings.draw_brick_radials)
                 for (int i = 0; i < arkanoid_debug_data.bricks_collisions.size(); ++i)
                     for (int j = 0; j < arkanoid_debug_data.bricks_collisions[0].size(); ++j)
-                        if (arkanoid_debug_data.bricks_collisions[i][j].is_visible)
+                        if (arkanoid_debug_data.bricks_collisions[i][j].visible)
                             for (int k = 0; k < 8; ++k)
                                 bg_drawlist->AddLine(arkanoid_debug_data.bricks_collisions[i][j].screen_points[k], arkanoid_debug_data.bricks_collisions[i][j].screen_points[(k + 1) % 8], ImColor(0, 255, 0));
         }
@@ -332,6 +331,8 @@ int main(int, char**)
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete arkanoid;
 
     return 0;
 }

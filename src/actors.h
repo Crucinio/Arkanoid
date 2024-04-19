@@ -45,10 +45,8 @@ struct Brick
     virtual BrickType get_brick_type();
 
     BrickCollision collision;
-    Vect brick_pos = Vect(0.0f);
-    Vect brick_size = Vect(0.0f);
-
-    bool can_be_damaged = true; // obstacle or not
+    Vect position = Vect(0.0f);
+    Vect size = Vect(0.0f);
     int hits_left = 1;
     int score = 100;
     int ticks_before_explosion = -1;
@@ -58,23 +56,24 @@ struct Brick
 struct ExplosiveBrick : Brick 
 {
     ExplosiveBrick() = default;
+    ExplosiveBrick(ExplosionType _explosion_type);
     ExplosiveBrick(const Brick& brick) : Brick::Brick(brick) {};
 
     BrickType get_brick_type() override;
 
     int explosion_dist = 1;
     unsigned int damage = 1;
-    ExplosionType expl_type = ExplosionType::Radial;
+    ExplosionType explosion_type = ExplosionType::Radial;
 };
 
 // ball, we can have multiple balls
 struct Ball
 {
+    Ball(Vect _position, Vect _velocity, float _radius, float _initial_speed);
     Vect position = Vect(0.0f);
     Vect velocity = Vect(0.0f);
     float radius = 0.0f;
     float initial_speed = 0.0f;
-    float speed = 0;
 
     bool active = true;
     bool on_start = true;
@@ -94,6 +93,7 @@ struct Bonus
 {
     Bonus() = default;
     Bonus(const Brick& brick);
+    Bonus(const Brick& brick, float _falling_speed, BonusType _type);
 
     Vect position = Vect(0.0f);
     Vect size = Vect(0.0f);
