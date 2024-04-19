@@ -126,7 +126,7 @@ private:
     const ImColor inner_bonus = ImColor(100, 180, 200);
 
     // paddings
-    float padding_lives_by_rad = 16.0f;
+    float padding_lives_by_radius = 16.0f;
     float padding_lives_from_bottom = 20.0f;
     float padding_score_text_from_top = 10.0f;
     float padding_playzone_from_top = 40.0f;
