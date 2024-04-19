@@ -42,7 +42,8 @@ private:
     Vect next_hit(const Vect& pos, const Vect& velocity, float radius); // calculates next hit
     BrickHitData process_brick_hit(Ball& ball, Vect prev_pos); // brick hit processing
     void update_collision_scaling(float radius, float prev_trans, float new_trans);
-    Brick* create_brick(Vect position, Vect size, BrickType type); // factory method to keep track of the init. sequence (pos + size before collision)
+    // to push back if need
+    std::shared_ptr<Brick> create_brick(Vect position, Vect size, BrickType type); // factory method to keep track of the init. sequence (pos + size before collision)
     void spawn_ball();
     void spawn_bonus_from_brick(const Brick& brick); // spawns a ball at brick_pos
     void process_possible_explosion(int i, int j); // on brick destruction, checks if it was an explosive brick and processes it
@@ -94,7 +95,7 @@ private:
     Racket racket;
     std::vector<Ball> balls;
     std::vector<Bonus> bonuses;
-    std::vector<std::vector<std::unique_ptr<Brick> > > bricks;
+    std::vector<std::vector<std::shared_ptr<Brick> > > bricks;
 
     // world
     Vect world_size = Vect(0.0f);
